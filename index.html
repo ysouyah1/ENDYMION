@@ -1,47 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ENDYMION Emulator Terminal</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;font-family:Consolas,monospace;height:100vh;overflow:hidden}
-.window{position:fixed;inset:0;background:#000;display:flex;flex-direction:column}
-.titlebar{background:#1a1a1a;color:#fff;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
-.win-btns{display:flex}
-.win-btns button{width:44px;height:44px;background:none;border:none;color:#fff;font-size:18px}
-.win-btns button:active{background:#333}
-.close:active{background:#e81123!important}
-.terminal{flex:1;background:#000;color:#fff;padding:14px;overflow-y:auto;font-size:16px;line-height:1.6}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#000;font-family:monospace;height:100dvh;overflow:hidden;touch-action:manipulation}
+.top{background:#1a1a1a;color:#fff;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:15px}
+.top button{width:48px;height:48px;background:none;border:none;color:#fff;font-size:22px}
+.top button:active{background:#333}
+.term{height:calc(100dvh - 50px - 150px);background:#000;color:#fff;padding:14px;overflow-y:auto;font-size:17px;line-height:1.6}
 .line{white-space:pre-wrap;word-break:break-word}
-.prompt{color:#00ff88}
-.input-line{display:flex;align-items:center;background:#111;border:1px solid #00ff88;border-radius:6px;padding:10px;margin-top:10px}
-.input-line input{flex:1;background:none;border:none;outline:none;color:#fff;font-family:inherit;font-size:18px;min-width:0}
-.kb-btn{background:#00ff88;color:#000;border:none;padding:12px;border-radius:8px;font-weight:bold;font-size:16px;margin:10px 0;width:100%}
-.taskbar{height:48px;background:#1a1a1a;display:flex;align-items:center;padding:0 10px;gap:10px;color:#fff;font-size:13px}
+.out{margin-bottom:8px}
+.bottom{background:#111;padding:10px;border-top:1px solid #222}
+.cmd-row{display:flex;gap:8px}
+.cmd-row input{flex:1;background:#1a1a1a;border:2px solid #00ff88;border-radius:12px;color:#fff;font-size:20px;padding:16px 12px;outline:none;min-width:0}
+.go-btn{background:#00ff88;color:#000;border:none;border-radius:12px;padding:0 22px;font-size:20px;font-weight:bold;min-width:70px}
+.go-btn:active{background:#00cc6a}
+.kb-btn{background:#222;color:#fff;border:1px solid #333;border-radius:12px;padding:12px;margin-top:10px;width:100%;font-size:16px}
+.quick{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px}
+.quick button{background:#222;color:#00ff88;border:1px solid #333;border-radius:20px;padding:10px 14px;font-size:14px;white-space:nowrap;flex-shrink:0}
+.quick button:active{background:#00ff88;color:#000}
 </style>
 </head>
 <body>
-<div class="window" id="win">
-<div class="titlebar"><div id="titleTxt">&gt; ENDYMION Emulator Terminal</div><div class="win-btns"><button onclick="minWin()">_</button><button onclick="maxWin()">□</button><button class="close" onclick="closeWin()">X</button></div></div>
-<div class="terminal" id="term" onclick="focusIn()">
-<div class="line">ENDYMION Emulator Terminal [Version 1.0]</div>
-<div class="line">(c) ENDYMION. Type help</div><br>
+<div class="top"><div>&gt; ENDYMION Emulator Terminal</div><div><button onclick="minWin()">_</button><button onclick="closeWin()">X</button></div></div>
+<div class="term" id="term" onclick="focusIn()">
+<div class="line">ENDYMION Emulator Terminal [Phone Edition]</div>
+<div class="line">اكتب help و اضغط GO</div><br>
 <div id="out"></div>
-<div class="input-line"><span class="prompt">C:\Users\Endymion&gt;&nbsp;</span><input id="inp" type="text" autocomplete="off" autocapitalize="off"></div>
-<button class="kb-btn" onclick="focusIn()">⌨️ اضغط هنا باش تكتب</button>
 </div>
-<div class="taskbar"><div>⊞ Start</div><div>ENDYMION</div><div style="margin-left:auto" id="time"></div></div>
+<div class="bottom">
+<div class="cmd-row">
+<input id="inp" type="text" placeholder="اكتب هنا... help" autocomplete="off" autocapitalize="off" enterkeyhint="go">
+<button class="go-btn" onclick="runCmd()">GO ▶</button>
+</div>
+<button class="kb-btn" onclick="focusIn()">⌨️ اضغط هنا باش يبان الكلافي</button>
+<div class="quick">
+<button onclick="quick('help')">help</button>
+<button onclick="quick('dir')">dir</button>
+<button onclick="quick('ver')">ver</button>
+<button onclick="quick('ipconfig')">ipconfig</button>
+<button onclick="quick('banner')">banner</button>
+<button onclick="quick('endy scan google.com')">endy scan</button>
+<button onclick="quick('cls')">cls</button>
+</div>
 </div>
 <script>
-let out=document.getElementById('out'),inp=document.getElementById('inp'),term=document.getElementById('term');
-function focusIn(){inp.focus();}
-function print(t){let d=document.createElement('div');d.className='line';d.textContent=t;out.appendChild(d);term.scrollTop=term.scrollHeight;}
-function cmd(c){
-let raw=c.trim(); if(!raw) return;
-let a=raw.toLowerCase();
-print('C:\\Users\\Endymion> '+raw);
-if(a==='help') print('help, dir, ls, echo, cls, clear, ver, ipconfig, whoami, date, time, pwd, color, title, banner, endy scan, exit');
-else if(a==='dir'||a==='ls') print('endy.exe\nENDYMION.txt\nindex.html');
-else if(a==='ver'||a==='version') print('ENDYM
+let out=document
